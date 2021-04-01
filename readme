@@ -1,0 +1,4 @@
+compile: gcc -o program_neve -fopenmp program_neve.cpp vagy .c ami van ...
+//ha van bent math.h akkor kell a vegere a -lm
+
+run: ./program_neve [options]
