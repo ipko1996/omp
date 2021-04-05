@@ -2,6 +2,31 @@
 #include <stdlib.h>
 #include <omp.h>
 
+void seqHist() 
+{
+	int n = 1000;
+	int bins = 256;
+	int* x = (int*)malloc(n * n * sizeof(int));
+	int* hist = (int*)malloc(bins * sizeof(int));
+	// init
+	for (int i = 0; i < n * n; i++) {
+		x[i] = (int)(255.0 * rand() / RAND_MAX);
+	}
+	for (int i = 0; i < bins; i++) {
+		hist[i] = 0;
+	}
+	double start = omp_get_wtime();
+	for (int i = 0; i < n; i++) {
+		for (int j = 0; j < n; j++) {
+			int v = x[i * n + j];
+			hist[v] ++;
+		}
+	}
+	double stop = omp_get_wtime();
+	printf("seq hist time: %.6f\n", (stop - start));
+
+}
+
 void hist(int th, int op)
 {
 	int n = 1000;
@@ -60,8 +85,12 @@ void hist(int th, int op)
 
 int main(int argc, char* argv[])
 {
+	if (argc == 1) {
+		seqHist();
+		return 0;
+	}
 	if (argc != 3) {
-		printf("Hibas adatok! Program hivasa --> program_neve thread option\n");
+		printf("Hibas adatok! Program hivasa --> program_neve thread option\nparameterek nelkul seq");
 		printf("Opciok: 0 - atomic, 1 - critical, 2 - reduce\n");
 	}
 	else {

@@ -2,6 +2,41 @@
 #include <stdlib.h>
 #include <omp.h>
 
+void seqMandelbrotSet(int N) 
+{
+	int iter_limit = 10000;
+	double c_re = 0.2;
+	double c_im = 0.4;
+
+	//SIMA
+	int i, j = 0;
+	int k = 1;
+	double start = omp_get_wtime();
+
+	for (i = 0; i < N; i++) {
+		for (j = 0; j < N; j++) {
+			int color = 0;
+			// bound test
+			double z_re = (double)i / N;
+			double z_im = (double)j / N;
+			double sum_re = z_re * z_re - z_im * z_im + c_re;
+			double sum_im = 2 * z_re * z_im + c_im;
+			for (k = 1; k < iter_limit; k++) {
+				double temp = sum_re;
+				sum_re += sum_re * sum_re - sum_im * sum_im + c_re;
+				sum_im += 2 * temp * sum_im + c_im;
+				if ((sum_re * sum_re + sum_im * sum_im) > 4) {
+					break;
+				}
+				color = k;
+			}
+		}
+	}
+	double end = omp_get_wtime();
+
+	printf("Mandelbrot seq: %.6f\n", (end - start));
+}
+
 void mandelbrotSet(int N, int t, int op)
 {
 	int iter_limit = 10000;
@@ -113,8 +148,13 @@ void mandelbrotSet(int N, int t, int op)
 
 int main(int argc, char* argv[])
 {
+	if (argc == 2) {
+		int db = atoi(argv[1]);
+		seqMandelbrotSet(db);
+		return 0;
+	}
 	if (argc != 4) {
-		printf("Hibas adatok! Program hivasa --> program_neve db thread option\n");
+		printf("Hibas adatok! Program hivasa --> program_neve db thread option\nseq eseten csak db kell");
 		printf("Opciok: 0 - sima, 1 - dynamic, 2 - guided\n");
 	}
 	else {
